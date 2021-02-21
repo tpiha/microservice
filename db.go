@@ -20,5 +20,9 @@ func initDb() *gorm.DB {
 		panic(err.Error())
 	}
 
+	sqlDB, err := db.DB()
+
+	sqlDB.SetMaxOpenConns(100)
+
 	return db
 }
