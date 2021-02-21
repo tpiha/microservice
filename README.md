@@ -4,4 +4,3 @@
 
 - [ ] worker logic
 - [ ] tests
-- [ ] github action
