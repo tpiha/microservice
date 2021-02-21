@@ -10,11 +10,17 @@ var (
 )
 
 type WorkerManager struct {
-	Jobs chan *Payload
+	Jobs []*Payload
 }
 
 func (wm *WorkerManager) addDatapoint(dp Payload) {
-	go func() { wm.Jobs <- &dp }()
+	// go func() {
+	// 	wm.Jobs <- &dp
+	// 	log.Println(len(wm.Jobs))
+	// }()
+	wm.Jobs = append(wm.Jobs, &dp)
+
+	log.Println(len(wm.Jobs))
 }
 
 func (wm *WorkerManager) process() {
@@ -25,8 +31,8 @@ func (wm *WorkerManager) process() {
 			<-semaphoreChan // read to release a slot
 		}()
 
-		p := <-wm.Jobs
-		go wm.savePayload(p)
+		// p := <-wm.Jobs
+		// go wm.savePayload(p)
 		// time.Sleep(time.Second * TICK)
 
 		wm.process()
@@ -43,7 +49,6 @@ func (wm *WorkerManager) savePayload(p *Payload) {
 
 func initWowkerManager() *WorkerManager {
 	wm := &WorkerManager{}
-	wm.Jobs = make(chan *Payload)
 	wm.process()
 	return wm
 }

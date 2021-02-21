@@ -15,6 +15,14 @@ services:
     environment:
       - 'DB_PORT=3306'
       - 'DB_HOST=database'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 500M
+        reservations:
+          cpus: '0.25'
+          memory: 200M
 
   database:
     build: 
