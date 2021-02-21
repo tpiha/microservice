@@ -1,6 +1,8 @@
 package main
 
 import (
+	"sync"
+
 	"github.com/go-macaron/binding"
 	"go.uber.org/ratelimit"
 	macaron "gopkg.in/macaron.v1"
@@ -13,9 +15,11 @@ var db *gorm.DB
 
 var mm *MetricsManager
 
-var wm WorkerManager
+var wm *WorkerManager
 
 var rl ratelimit.Limiter
+
+var mu sync.Mutex
 
 func main() {
 	db = initDb()
@@ -27,8 +31,6 @@ func main() {
 	m = macaron.New()
 
 	m.Use(macaron.Renderer())
-
-	rl = ratelimit.New(10000)
 
 	m.Post("/process", binding.Json(Payload{}), processPayload)
 

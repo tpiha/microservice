@@ -17,33 +17,36 @@ type WorkerManager struct {
 }
 
 func (wm *WorkerManager) addDatapoint(dp *Payload) {
+	mu.Lock()
+	defer mu.Unlock()
 	wm.Jobs = append(wm.Jobs, dp)
 }
 
 func (wm *WorkerManager) process() {
-	if len(wm.Jobs) >= 1000 {
-		// var wg sync.WaitGroup
-		// semaphoreChan <- struct{}{}
-		// wg.Add(1)
-		// go func(wg sync.WaitGroup) {
-		// 	defer func() {
-		// 		<-semaphoreChan // read to release a slot
-		// 		wg.Done()
-		// 		wm.process()
-		// 	}()
+	go func(wm *WorkerManager) {
+		for {
+			if len(wm.Jobs) >= 1000 {
+				mu.Lock()
+				jobs := wm.Jobs[:1000]
+				wm.Jobs = wm.Jobs[1000:]
+				mu.Unlock()
 
-		// }(wg)
-		// wg.Wait()
-		// wm.savePayload(wm.Jobs[:1000])
-		// wm.Jobs = wm.Jobs[1001:]
-		// wm.process()
-		time.Sleep(time.Second * TICK)
-		log.Println(len(wm.Jobs))
-		wm.process()
-	} else {
-		time.Sleep(time.Second * TICK)
-		wm.process()
-	}
+				dpl := []*Datapoint{}
+
+				for _, p := range jobs {
+					dp := &Datapoint{Timestamp: uint64(p.Ts), Metric: mm.TS}
+					dpl = append(dpl, dp)
+				}
+
+				if err := db.CreateInBatches(dpl, 1000).Error; err != nil {
+					log.Println(err)
+				}
+			} else {
+				log.Println(len(wm.Jobs))
+				time.Sleep(time.Second * TICK)
+			}
+		}
+	}(wm)
 }
 
 func (wm *WorkerManager) savePayload(pd []*Payload) {
@@ -53,14 +56,14 @@ func (wm *WorkerManager) savePayload(pd []*Payload) {
 		dp := &Datapoint{Timestamp: uint64(p.Ts), Metric: mm.TS}
 		dpl = append(dpl, dp)
 	}
-	if err := db.Create(dpl).Error; err != nil {
+	if err := db.CreateInBatches(dpl, 10).Error; err != nil {
 		log.Println(err)
 		wm.savePayload(pd)
 	}
 }
 
-func initWorkerManager() WorkerManager {
-	wm := WorkerManager{}
-	go wm.process()
+func initWorkerManager() *WorkerManager {
+	wm := &WorkerManager{}
+	wm.process()
 	return wm
 }
