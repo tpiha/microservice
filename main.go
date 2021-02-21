@@ -1,10 +1,8 @@
 package main
 
 import (
-	"time"
-
 	"github.com/go-macaron/binding"
-	"github.com/martini-contrib/throttle"
+	"go.uber.org/ratelimit"
 	macaron "gopkg.in/macaron.v1"
 	"gorm.io/gorm"
 )
@@ -15,31 +13,38 @@ var db *gorm.DB
 
 var mm *MetricsManager
 
-var wm *WorkerManager
+var wm WorkerManager
 
-var counter uint64
+var rl ratelimit.Limiter
 
 func main() {
-	counter = 0
-
 	db = initDb()
 
 	mm = initMetricsManager()
 
-	wm = initWowkerManager()
+	wm = initWorkerManager()
 
 	m = macaron.New()
 
 	m.Use(macaron.Renderer())
 
-	m.Use(throttle.Policy(&throttle.Quota{
-		Limit:  1,
-		Within: time.Microsecond,
-	}))
+	rl = ratelimit.New(10000)
 
 	m.Post("/process", binding.Json(Payload{}), processPayload)
 
-	// tollbooth.LimitFuncHandler(tollbooth.NewLimiter(100000, nil)),
-
 	m.Run("0.0.0.0", 8080)
+
+	// mux := http.NewServeMux()
+	// mux.HandleFunc("/process", hello)
+
+	// srv := &http.Server{
+	// 	Addr:              ":8080",
+	// 	ReadTimeout:       5 * time.Second,
+	// 	ReadHeaderTimeout: 5 * time.Second,
+	// 	WriteTimeout:      10 * time.Second,
+	// 	IdleTimeout:       5 * time.Second,
+	// 	Handler:           mux,
+	// }
+	// log.Println(srv.ListenAndServe())
+	// log.Fatal(http.ListenAndServe(":8080", mux))
 }

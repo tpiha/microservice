@@ -8,14 +8,16 @@ import (
 )
 
 func processPayload(ctx *macaron.Context, p Payload) {
-	counter++
-	log.Println(counter)
-
-	// wm.addDatapoint(p)
+	rl.Take()
+	// counter++
+	// go fmt.Println(counter)
+	wm.addDatapoint(&p)
+	log.Println(len(wm.Jobs))
 	ctx.JSON(200, map[string]string{"status": "success"})
 }
 
 func hello(w http.ResponseWriter, r *http.Request) {
-	counter++
-	log.Println(counter)
+	// counter++
+	// log.Println(counter)
+	w.Write([]byte("OK"))
 }
