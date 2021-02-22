@@ -17,4 +17,4 @@
 
 You can access phpMyAdmin on http://localhost:8081 using username ```root``` and password ```root```.
 
-Load testing (integration testing) is also done manually using "Manual test run" GitHub Actions workflow.
+Load testing (integration testing) is also done manually by using "Manual test run" GitHub Actions workflow.
