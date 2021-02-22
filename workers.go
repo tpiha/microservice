@@ -36,10 +36,14 @@ func (wm *WorkerManager) process() {
 				// dpl := []*Datapoint{}
 
 				for _, p := range jobs {
-					dp := &Datapoint{Timestamp: uint64(p.Ts), Metric: mm.TS}
-					if err := db.Create(dp).Error; err != nil {
-						log.Println(err)
-					}
+					go func(p *Payload) {
+						dp := &Datapoint{Timestamp: uint64(p.Ts), Metric: mm.TS}
+						mudb.Lock()
+						defer mudb.Unlock()
+						if err := db.Create(dp).Error; err != nil {
+							log.Println(err)
+						}
+					}(p)
 				}
 			} else {
 				log.Println(len(wm.Jobs))
