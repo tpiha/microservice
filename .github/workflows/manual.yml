@@ -14,27 +14,16 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    services:
-      database:
-        image: mysql:5.7
-        env:
-          MYSQL_DATABASE: microservice
-          MYSQL_USER: microservice
-          MYSQL_PASSWORD: microservice
-          MYSQL_ROOT_PASSWORD: root
-        ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
-
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - name: Verify MySQL connection
-      run: |
-        mysql --version
-        sudo apt-get install -y mysql-client
-        mysql --host 127.0.0.1 --port ${{ job.services.database.ports['3306'] }} -uroot -proot -e "SHOW DATABASES"
+    - uses: actions/checkout@v1
+    - name: Build the docker-compose stack
+      run: docker-compose -f docker-compose.yml -d
+    - name: Check running containers
+      run: docker ps -a
+    - name: Check logs
+      run: docker logs backend
 
-    - uses: actions/checkout@v2
 
     - name: Set up Go
       uses: actions/setup-go@v2
