@@ -39,3 +39,5 @@ Load testing (integration testing) is also done manually by using "Manual test r
 Unit tests are done automatically by pushing changes to main branch of GitHub repo.
 
 #### TODO LIST
+
+- [ ] mysql rollback issue
