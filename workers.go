@@ -25,15 +25,54 @@ func (wm *WorkerManager) addDatapoint(dp *Payload) {
 func (wm *WorkerManager) process() {
 	go func(wm *WorkerManager) {
 		for {
-			if len(wm.Jobs) >= 1000 {
+			if len(wm.Jobs) >= 100 {
 				mu.Lock()
-				jobs := wm.Jobs[:1000]
-				wm.Jobs = wm.Jobs[1000:]
+				jobs := wm.Jobs[:100]
+				wm.Jobs = wm.Jobs[100:]
 				mu.Unlock()
 				log.Println(len(jobs))
 				log.Println(len(wm.Jobs))
 
+				// sql := "INSERT into `datapoints` (timestamp, metric_id) VALUES "
+
+				// for _, p := range jobs {
+				// 	sql += fmt.Sprintf("(%d, %d),", p.Ts, mm.TS.ID)
+				// }
+
+				// sql = strings.TrimSuffix(sql, ",")
+
+				// db.Exec(sql)
+
 				// dpl := []*Datapoint{}
+				// var err error
+
+				// for _, p := range jobs {
+				// 	dp := &Datapoint{Timestamp: uint64(p.Ts), Metric: mm.TS}
+				// 	dpl = append(dpl, dp)
+				// }
+
+				// if err = db.CreateInBatches(dpl, 100).Error; err != nil {
+				// 	log.Println(err)
+				// }
+
+				// check := true
+				// for check {
+				// 	dplnew := []*Datapoint{}
+				// 	for _, dp := range dpl {
+				// 		if dp.ID == 0 {
+				// 			dplnew = append(dplnew, dp)
+				// 		}
+				// 	}
+
+				// 	if len(dplnew) == 0 {
+				// 		check = false
+				// 	} else {
+				// 		log.Println(len(dplnew))
+				// 		if err = db.CreateInBatches(dplnew, 100).Error; err != nil {
+				// 			log.Println(err)
+				// 		}
+				// 	}
+				// }
 
 				for _, p := range jobs {
 					go func(p *Payload) {
