@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"github.com/go-macaron/binding"
-	"go.uber.org/ratelimit"
 	macaron "gopkg.in/macaron.v1"
 	"gorm.io/gorm"
 )
@@ -16,8 +15,6 @@ var db *gorm.DB
 var mm *MetricsManager
 
 var wm *WorkerManager
-
-var rl ratelimit.Limiter
 
 var mu sync.Mutex
 
