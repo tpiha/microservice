@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql:
+      database:
         image: mysql:5.7
         env:
           MYSQL_DATABASE: microservice
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
+          MYSQL_USER: microservice
+          MYSQL_PASSWORD: microservice
           MYSQL_ROOT_PASSWORD: root
         ports:
           - 3306
