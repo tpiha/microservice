@@ -86,7 +86,6 @@ func (wm *WorkerManager) process() {
 					}(p)
 				}
 			} else {
-				log.Println(len(wm.Jobs))
 				time.Sleep(time.Second * TICK)
 			}
 		}
