@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"testing"
@@ -41,21 +43,6 @@ func doWork(item int) {
 	}(item)
 }
 
-func checkHealth() bool {
-	resp, err := client.R().
-		Get(fmt.Sprintf("http://localhost:8080/health"))
-
-	if err != nil {
-		return false
-	}
-
-	if !strings.Contains(string(resp.Body()), "OK") {
-		return false
-	}
-
-	return true
-}
-
 func checkHealthCount() bool {
 	resp, err := client.R().
 		Get(fmt.Sprintf("http://localhost:8080/health-count"))
@@ -72,24 +59,30 @@ func checkHealthCount() bool {
 }
 
 func TestMicroservice(t *testing.T) {
+	os.Remove("microservice.db")
+	cmd := exec.Command("microservice")
+	go cmd.CombinedOutput()
+
+	time.Sleep(time.Second)
+
 	client = resty.New()
 
-	if checkHealth() {
-		fmt.Printf("Testing microservice...\n")
+	fmt.Printf("Testing microservice...\n")
 
-		for i := 1; i <= 10000; i++ {
-			wg.Add(1)
-			doWork(i)
-		}
-
-		wg.Wait()
-
-		wait := true
-
-		for wait {
-			wait = !checkHealthCount()
-			fmt.Printf("Waiting for records...\n")
-			time.Sleep(time.Second)
-		}
+	for i := 1; i <= 10000; i++ {
+		wg.Add(1)
+		doWork(i)
 	}
+
+	wg.Wait()
+
+	wait := true
+
+	for wait {
+		wait = !checkHealthCount()
+		fmt.Printf("Waiting for records...\n")
+		time.Sleep(time.Second)
+	}
+
+	cmd.Process.Kill()
 }

@@ -11,10 +11,6 @@ func processPayload(ctx *macaron.Context, p Payload) {
 	ctx.JSON(200, map[string]string{"status": "success"})
 }
 
-func healthCheck(ctx *macaron.Context) string {
-	return "OK"
-}
-
 func healthCountCheck(ctx *macaron.Context) string {
 	var dps []*Datapoint
 	db.Find(&dps)

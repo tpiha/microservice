@@ -41,7 +41,6 @@ func main() {
 	m.Use(macaron.Renderer())
 
 	m.Post("/process", binding.Json(Payload{}), processPayload)
-	m.Get("/health", healthCheck)
 	m.Get("/health-count", healthCountCheck)
 
 	go m.Run("0.0.0.0", 8080)
