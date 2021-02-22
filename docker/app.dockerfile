@@ -4,10 +4,16 @@ WORKDIR /microservice
 
 ADD . .
 
+RUN apk add --no-cache \
+        libc6-compat
+
+RUN apk update && apk add --virtual build-dependencies build-base gcc wget git
+
 RUN go mod download
 
-RUN ulimit -s 1048576
+# RUN go get github.com/githubnemo/CompileDaemon
 
-RUN go get github.com/githubnemo/CompileDaemon
+# ENTRYPOINT CompileDaemon -command="./microservice"
 
-ENTRYPOINT CompileDaemon -command="./microservice"
+# ENTRYPOINT /microservice/microservice
+ENTRYPOINT go build -tags netgo -a -v && ./microservice

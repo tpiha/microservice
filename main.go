@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"sync"
 
 	"github.com/go-macaron/binding"
@@ -20,7 +21,15 @@ var mu sync.Mutex
 
 var mudb sync.Mutex
 
+var sigs chan os.Signal
+
+var mcrdone chan struct{}
+
+var dbdone chan struct{}
+
 func main() {
+	sigs, mcrdone, dbdone = initSignalHandler()
+
 	db = initDb()
 
 	mm = initMetricsManager()
@@ -35,5 +44,8 @@ func main() {
 	m.Get("/health", healthCheck)
 	m.Get("/health-count", healthCountCheck)
 
-	m.Run("0.0.0.0", 8080)
+	go m.Run("0.0.0.0", 8080)
+
+	<-mcrdone
+	<-dbdone
 }

@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -19,6 +20,9 @@ func initDb() *gorm.DB {
 		}); err != nil {
 
 		log.Printf("[initDb] error: %s", err)
+
+		db, _ = gorm.Open(sqlite.Open("microservice.db"), &gorm.Config{})
+
 	}
 
 	if err := db.AutoMigrate(&Metric{}, &Datapoint{}); err != nil {

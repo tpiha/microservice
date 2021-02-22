@@ -29,5 +29,4 @@ Unit tests are done automatically by pushing changes to main branch of GitHub re
 
 #### TODO LIST
 
-- [ ] finish worker logic
 - [ ] shutdown gracefully

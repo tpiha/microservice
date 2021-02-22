@@ -15,6 +15,7 @@ services:
     environment:
       - 'DB_PORT=3306'
       - 'DB_HOST=database'
+    init: true
 
   database:
     build: 
