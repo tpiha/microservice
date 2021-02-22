@@ -13,7 +13,18 @@
   - automatic unit testing
   - manual integration test with GitHub Actions
 
-#### USAGE
+#### SIMPLE USAGE
+
+```
+go build
+
+./microservice
+
+ab -p test.json -T application/json -c 100 -n 10000 http://localhost:8080/process
+
+```
+
+#### DOCKER-COMPOSE USAGE
 
 ```docker-compose build```
 
