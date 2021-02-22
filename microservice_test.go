@@ -57,6 +57,21 @@ func checkHealth() bool {
 	return true
 }
 
+func checkHealthCount() bool {
+	resp, err := client.R().
+		Get(fmt.Sprintf("http://localhost:8080/health-count"))
+
+	if err != nil {
+		return false
+	}
+
+	if !strings.Contains(string(resp.Body()), "1000") {
+		return false
+	}
+
+	return true
+}
+
 func TestMicroservice(t *testing.T) {
 	client = resty.New()
 
@@ -77,11 +92,20 @@ func TestMicroservice(t *testing.T) {
 
 	if checkHealth() {
 		fmt.Printf("Testing microservice...\n")
+
 		for i := 1; i <= 1000; i++ {
 			wg.Add(1)
 			doWork(i)
 		}
-	}
 
-	wg.Wait()
+		wg.Wait()
+
+		wait := true
+
+		for wait {
+			wait = !checkHealthCount()
+			fmt.Printf("Waiting for records...\n")
+			time.Sleep(time.Second)
+		}
+	}
 }

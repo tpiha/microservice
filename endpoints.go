@@ -1,7 +1,7 @@
 package main
 
 import (
-	"net/http"
+	"strconv"
 
 	macaron "gopkg.in/macaron.v1"
 )
@@ -11,8 +11,12 @@ func processPayload(ctx *macaron.Context, p Payload) {
 	ctx.JSON(200, map[string]string{"status": "success"})
 }
 
-func healthCheck(w http.ResponseWriter, r *http.Request) {
-	// counter++
-	// log.Println(counter)
-	w.Write([]byte("OK"))
+func healthCheck(ctx *macaron.Context) string {
+	return "OK"
+}
+
+func healthCountCheck(ctx *macaron.Context) string {
+	var dps []*Datapoint
+	db.Find(&dps)
+	return strconv.Itoa(len(dps))
 }

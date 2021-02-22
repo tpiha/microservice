@@ -36,6 +36,7 @@ func main() {
 
 	m.Post("/process", binding.Json(Payload{}), processPayload)
 	m.Get("/health", healthCheck)
+	m.Get("/health-count", healthCountCheck)
 
 	m.Run("0.0.0.0", 8080)
 
