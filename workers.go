@@ -3,14 +3,13 @@ package main
 import (
 	"log"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 const TICK = 1
 
 type WorkerManager struct {
-	Jobs chan *Payload
+	Jobs    chan *Payload
+	LastJob *Payload
 }
 
 func (wm *WorkerManager) addDatapoint(p *Payload) {
@@ -26,7 +25,8 @@ func (wm *WorkerManager) process() {
 					job := <-wm.Jobs
 					jobs = append(jobs, job)
 				}
-				wm.saveBatch(jobs, *db, *mm)
+				wm.saveBatch(jobs)
+				log.Println(len(jobs))
 			}
 
 			time.Sleep(time.Millisecond * TICK * 100)
@@ -34,8 +34,8 @@ func (wm *WorkerManager) process() {
 	}()
 }
 
-func (wm *WorkerManager) saveBatch(jobs []*Payload, dbo gorm.DB, mmo MetricsManager) {
-	tx := dbo.Begin()
+func (wm *WorkerManager) saveBatch(jobs []*Payload) {
+	tx := db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -46,20 +46,33 @@ func (wm *WorkerManager) saveBatch(jobs []*Payload, dbo gorm.DB, mmo MetricsMana
 		log.Println(err)
 	}
 
+	diff := uint(0)
+
 	for _, job := range jobs {
 		var err error
-		dp := &Datapoint{Timestamp: uint64(job.Ts), Metric: mmo.TS}
+
+		if wm.LastJob != nil {
+			diff = wm.processDiff(job.Value, wm.LastJob.Value)
+		}
+
+		dp := &Datapoint{Timestamp: uint64(job.Ts), Metric: mm.TS, Value: uint(job.Value), Diff: uint(diff)}
 		if err = tx.Create(dp).Error; err != nil {
 			tx.Rollback()
 			log.Println(err)
 		}
+
+		wm.LastJob = job
 	}
 
-	mudb.Lock()
-	defer mudb.Unlock()
 	if err := tx.Commit().Error; err != nil {
 		log.Println(err)
 	}
+}
+
+func (wm *WorkerManager) processDiff(currentValue float64, lastValue float64) uint {
+	cvi := uint(currentValue * float64(100))
+	lvi := uint(lastValue * float64(100))
+	return cvi - lvi
 }
 
 func initWorkerManager() *WorkerManager {

@@ -13,4 +13,5 @@ type Datapoint struct {
 	Metric    *Metric
 	Timestamp uint64
 	Value     uint
+	Diff      uint
 }

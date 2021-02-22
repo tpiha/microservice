@@ -1,45 +1,30 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
-func IntMin(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
+func TestProcessDiff(t *testing.T) {
+	a := 55.5
+	b := 35.25
 
-func TestIntMinBasic(t *testing.T) {
-	ans := IntMin(2, -2)
-	if ans != -2 {
+	wm := initWorkerManager()
+	c := wm.processDiff(a, b)
 
-		t.Errorf("IntMin(2, -2) = %d; want -2", ans)
+	if c != 2025 {
+		t.Errorf("got %d, want %d", c, 2025)
 	}
 }
 
-func TestIntMinTableDriven(t *testing.T) {
-	var tests = []struct {
-		a, b int
-		want int
-	}{
-		{0, 1, 0},
-		{1, 0, 0},
-		{2, -2, -2},
-		{0, -1, -1},
-		{-1, 0, -1},
+func TestAddDatapoint(t *testing.T) {
+	wm := initWorkerManager()
+
+	for i := 0; i < 10; i++ {
+		p := &Payload{}
+		wm.addDatapoint(p)
 	}
 
-	for _, tt := range tests {
-
-		testname := fmt.Sprintf("%d,%d", tt.a, tt.b)
-		t.Run(testname, func(t *testing.T) {
-			ans := IntMin(tt.a, tt.b)
-			if ans != tt.want {
-				t.Errorf("got %d, want %d", ans, tt.want)
-			}
-		})
+	if len(wm.Jobs) != 10 {
+		t.Errorf("got %d, want %d", len(wm.Jobs), 10)
 	}
 }
