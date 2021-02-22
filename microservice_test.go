@@ -58,8 +58,6 @@ func checkHealth() bool {
 }
 
 func TestMicroservice(t *testing.T) {
-	fmt.Printf("Testing microservice...\n")
-
 	client = resty.New()
 
 	client.
@@ -78,6 +76,7 @@ func TestMicroservice(t *testing.T) {
 		})
 
 	if checkHealth() {
+		fmt.Printf("Testing microservice...\n")
 		for i := 1; i <= 1000; i++ {
 			wg.Add(1)
 			doWork(i)
