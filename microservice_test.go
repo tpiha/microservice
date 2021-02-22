@@ -60,7 +60,7 @@ func checkHealthCount() bool {
 
 func TestMicroservice(t *testing.T) {
 	os.Remove("microservice.db")
-	cmd := exec.Command("microservice")
+	cmd := exec.Command("./microservice")
 	go cmd.CombinedOutput()
 
 	time.Sleep(time.Second)
