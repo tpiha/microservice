@@ -26,6 +26,7 @@ func (wm *WorkerManager) process() {
 					jobs = append(jobs, job)
 				}
 				wm.saveBatch(jobs)
+				log.Println(len(jobs))
 			}
 
 			time.Sleep(time.Millisecond * TICK * 100)
