@@ -11,7 +11,7 @@ func processPayload(ctx *macaron.Context, p Payload) {
 	ctx.JSON(200, map[string]string{"status": "success"})
 }
 
-func hello(w http.ResponseWriter, r *http.Request) {
+func healthCheck(w http.ResponseWriter, r *http.Request) {
 	// counter++
 	// log.Println(counter)
 	w.Write([]byte("OK"))

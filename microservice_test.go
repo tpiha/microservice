@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -12,17 +13,17 @@ import (
 )
 
 var (
-	concurrentTest    = 100
-	semaphoreChanTest = make(chan struct{}, concurrentTest)
-	client            *resty.Client
-	wg                sync.WaitGroup
+	concurrent    = 100
+	semaphoreChan = make(chan struct{}, concurrent)
+	client        *resty.Client
+	wg            sync.WaitGroup
 )
 
 func doWork(item int) {
-	semaphoreChanTest <- struct{}{} // block while full
+	semaphoreChan <- struct{}{} // block while full
 	go func(item int) {
 		defer func() {
-			<-semaphoreChanTest // read to release a slot
+			<-semaphoreChan // read to release a slot
 			wg.Done()
 		}()
 
@@ -30,13 +31,6 @@ func doWork(item int) {
 			SetBody(Payload{Ts: 1600346834534, MetricID: 1, Value: 43.2}).
 			SetResult(&Payload{}).
 			Post(fmt.Sprintf("http://localhost:8080/process?v=%d", item))
-		// if err != nil ||
-		// 	!strings.Contains(string(resp.Body()), "success") ||
-		// 	resp.StatusCode() != 200 {
-		// 	log.Println(resp)
-		// 	log.Println(err)
-		// 	doWork(item)
-		// }
 
 		if err != nil ||
 			resp.StatusCode() != 200 {
@@ -45,9 +39,22 @@ func doWork(item int) {
 			doWork(item)
 		}
 
-		log.Println("done")
-
 	}(item)
+}
+
+func checkHealth() bool {
+	resp, err := client.R().
+		Get(fmt.Sprintf("http://localhost:8080/health"))
+
+	if err != nil {
+		return false
+	}
+
+	if !strings.Contains(string(resp.Body()), "OK") {
+		return false
+	}
+
+	return true
 }
 
 func TestMicroservice(t *testing.T) {
@@ -70,9 +77,11 @@ func TestMicroservice(t *testing.T) {
 			return 0, errors.New("quota exceeded")
 		})
 
-	for i := 1; i <= 50000; i++ {
-		wg.Add(1)
-		doWork(i)
+	if checkHealth() {
+		for i := 1; i <= 1000; i++ {
+			wg.Add(1)
+			doWork(i)
+		}
 	}
 
 	wg.Wait()

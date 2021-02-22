@@ -7,11 +7,6 @@ import (
 
 const TICK = 1
 
-var (
-	concurrent    = 1000
-	semaphoreChan = make(chan struct{}, concurrent)
-)
-
 type WorkerManager struct {
 	Jobs []*Payload
 }
