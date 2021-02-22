@@ -21,6 +21,8 @@ var rl ratelimit.Limiter
 
 var mu sync.Mutex
 
+var mudb sync.Mutex
+
 func main() {
 	db = initDb()
 

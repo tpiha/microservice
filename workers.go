@@ -30,16 +30,16 @@ func (wm *WorkerManager) process() {
 				jobs := wm.Jobs[:1000]
 				wm.Jobs = wm.Jobs[1000:]
 				mu.Unlock()
+				log.Println(len(jobs))
+				log.Println(len(wm.Jobs))
 
-				dpl := []*Datapoint{}
+				// dpl := []*Datapoint{}
 
 				for _, p := range jobs {
 					dp := &Datapoint{Timestamp: uint64(p.Ts), Metric: mm.TS}
-					dpl = append(dpl, dp)
-				}
-
-				if err := db.CreateInBatches(dpl, 1000).Error; err != nil {
-					log.Println(err)
+					if err := db.Create(dp).Error; err != nil {
+						log.Println(err)
+					}
 				}
 			} else {
 				log.Println(len(wm.Jobs))
