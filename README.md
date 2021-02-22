@@ -2,7 +2,16 @@
 
 #### FEATURES
 
-- fdsfdas
+- three containers
+  - web worker
+  - mysql database
+  - phpMyadmin
+- high load processing endpoint
+- saving to database in the background
+- DevOps work
+  - docker-compose setup
+  - automatic unit testing
+  - manual integration test with GitHub Actions
 
 #### TODO LIST
 
