@@ -13,13 +13,6 @@
   - automatic unit testing
   - manual integration test with GitHub Actions
 
-#### TODO LIST
-
-- [ ] worker logic
-- [ ] crash example
-- [ ] graceful shutdown
-- [ ] tests
-
 #### USAGE
 
 ```docker-compose build```
@@ -33,3 +26,10 @@ You can access phpMyAdmin on http://localhost:8081 using username ```root``` and
 Load testing (integration testing) is also done manually by using "Manual test run" GitHub Actions workflow.
 
 Unit tests are done automatically by pushing changes to main branch of GitHub repo.
+
+#### TODO LIST
+
+- [ ] worker logic
+- [ ] crash example
+- [ ] graceful shutdown
+- [ ] tests
