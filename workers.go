@@ -37,11 +37,17 @@ func (wm *WorkerManager) process() {
 
 				for _, p := range jobs {
 					go func(p *Payload) {
+						var err error
 						dp := &Datapoint{Timestamp: uint64(p.Ts), Metric: mm.TS}
 						mudb.Lock()
 						defer mudb.Unlock()
-						if err := db.Create(dp).Error; err != nil {
+						if err = db.Create(dp).Error; err != nil {
 							log.Println(err)
+						}
+						for err != nil || dp.ID == 0 {
+							if err = db.Create(dp).Error; err != nil {
+								log.Println(err)
+							}
 						}
 					}(p)
 				}
