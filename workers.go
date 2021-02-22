@@ -92,19 +92,6 @@ func (wm *WorkerManager) process() {
 	}(wm)
 }
 
-func (wm *WorkerManager) savePayload(pd []*Payload) {
-	dpl := []*Datapoint{}
-
-	for _, p := range pd {
-		dp := &Datapoint{Timestamp: uint64(p.Ts), Metric: mm.TS}
-		dpl = append(dpl, dp)
-	}
-	if err := db.CreateInBatches(dpl, 10).Error; err != nil {
-		log.Println(err)
-		wm.savePayload(pd)
-	}
-}
-
 func initWorkerManager() *WorkerManager {
 	wm := &WorkerManager{}
 	wm.process()
