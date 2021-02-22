@@ -64,7 +64,7 @@ func checkHealthCount() bool {
 		return false
 	}
 
-	if !strings.Contains(string(resp.Body()), "1000") {
+	if !strings.Contains(string(resp.Body()), "10000") {
 		return false
 	}
 
@@ -77,7 +77,7 @@ func TestMicroservice(t *testing.T) {
 	if checkHealth() {
 		fmt.Printf("Testing microservice...\n")
 
-		for i := 1; i <= 1000; i++ {
+		for i := 1; i <= 10000; i++ {
 			wg.Add(1)
 			doWork(i)
 		}
