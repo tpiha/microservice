@@ -39,18 +39,4 @@ func main() {
 	m.Get("/health-count", healthCountCheck)
 
 	m.Run("0.0.0.0", 8080)
-
-	// mux := http.NewServeMux()
-	// mux.HandleFunc("/process", hello)
-
-	// srv := &http.Server{
-	// 	Addr:              ":8080",
-	// 	ReadTimeout:       5 * time.Second,
-	// 	ReadHeaderTimeout: 5 * time.Second,
-	// 	WriteTimeout:      10 * time.Second,
-	// 	IdleTimeout:       5 * time.Second,
-	// 	Handler:           mux,
-	// }
-	// log.Println(srv.ListenAndServe())
-	// log.Fatal(http.ListenAndServe(":8080", mux))
 }
