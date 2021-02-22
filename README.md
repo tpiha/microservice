@@ -3,7 +3,7 @@
 #### FEATURES
 
 - three containers
-  - web worker
+  - Golang web worker
   - mysql database
   - phpMyadmin
 - high load processing endpoint
